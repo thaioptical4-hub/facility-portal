@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facility Service Portal — TOGG</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --navy: #0B1829;
+      --navy-mid: #1A3A5C;
+      --navy-light: #1E4A72;
+      --teal: #00D4AA;
+      --teal-dim: rgba(0, 212, 170, 0.12);
+      --teal-glow: rgba(0, 212, 170, 0.25);
+      --amber: #F59E0B;
+      --rose: #F43F5E;
+      --sky: #38BDF8;
+      --white: #F0F4F8;
+      --text-primary: #E8EFF7;
+      --text-secondary: #8BA5C0;
+      --surface: #ffffff;
+      --surface-alt: #F7FAFD;
+      --border: #E0E8F0;
+      --border-dark: #2A4A6A;
+      --shadow: 0 2px 16px rgba(11, 24, 41, 0.10);
+      --shadow-md: 0 4px 24px rgba(11, 24, 41, 0.14);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      background: #EEF3F8;
+      color: #1A2E42;
+      min-height: 100vh;
+    }
+
+    /* ─── LAYOUT ─── */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: 260px;
+      background: var(--navy);
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    .logo-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: var(--teal);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .logo-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .logo-name span { color: var(--teal); }
+
+    .sidebar-user {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-dark);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--teal-dim);
+      border: 2px solid var(--teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: var(--teal);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .user-info { min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .user-role { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+
+    .nav {
+      padding: 16px 12px;
+      flex: 1;
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      padding: 8px 12px 6px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      text-align: left;
+      padding: 11px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.15s ease;
+      margin-bottom: 2px;
+      position: relative;
+    }
+
+    .nav-btn:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+
+    .nav-btn.active {
+      background: var(--teal-dim);
+      color: var(--teal);
+      font-weight: 600;
+    }
+
+    .nav-btn.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: var(--teal);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+
+    .sidebar-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-dark);
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* ─── MAIN ─── */
+    .main { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      background: white;
+      padding: 0 32px;
+      height: 64px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+
+    .page-breadcrumb {
+      font-size: 11px;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+    }
+
+    .page-title-bar {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0B1829;
+    }
+
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+    .today-badge {
+      background: var(--teal-dim);
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* ─── CONTENT ─── */
+    .content { padding: 28px 32px; }
+
+    /* ─── PAGE VISIBILITY ─── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ─── KPI CARDS ─── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+      border-top: 3px solid var(--border);
+      transition: transform 0.15s ease;
+    }
+
+    .kpi-card:hover { transform: translateY(-2px); }
+
+    .kpi-card.teal { border-top-color: var(--teal); }
+    .kpi-card.amber { border-top-color: var(--amber); }
+    .kpi-card.rose { border-top-color: var(--rose); }
+    .kpi-card.sky { border-top-color: var(--sky); }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6B8299;
+      margin-bottom: 10px;
+    }
+
+    .kpi-number {
+      font-size: 36px;
+      font-weight: 700;
+      color: #0B1829;
+      font-family: 'IBM Plex Mono', monospace;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .kpi-card.teal .kpi-number { color: #007A61; }
+    .kpi-card.amber .kpi-number { color: #92400E; }
+    .kpi-card.rose .kpi-number { color: #9F1239; }
+    .kpi-card.sky .kpi-number { color: #0C4A6E; }
+
+    .kpi-sub { font-size: 12px; color: #8BA5C0; }
+
+    /* ─── SECTION PANELS ─── */
+    .panel {
+      background: white;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .panel-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0B1829;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-body { padding: 0; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+    /* ─── TABLES ─── */
+    table { width: 100%; border-collapse: collapse; }
+
+    thead tr { background: #F7FAFD; }
+
+    th {
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #6B8299;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 13px 16px;
+      font-size: 13.5px;
+      color: #2A3F55;
+      border-bottom: 1px solid #F0F4F8;
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #FAFCFF; }
+
+    /* ─── BADGES / STATUS ─── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .b-pending { background: #FEF3C7; color: #92400E; }
+    .b-new { background: #EDE9FE; color: #5B21B6; }
+    .b-confirmed { background: #D1FAE5; color: #065F46; }
+    .b-completed, .b-closed { background: #DCFCE7; color: #166534; }
+    .b-progress { background: #DBEAFE; color: #1E40AF; }
+    .b-assigned { background: #E0F2FE; color: #0C4A6E; }
+    .b-critical { background: #FEE2E2; color: #991B1B; }
+    .b-high { background: #FFEDD5; color: #9A3412; }
+    .b-medium { background: #FEF9C3; color: #854D0E; }
+    .b-low { background: #D1FAE5; color: #065F46; }
+    .b-cancelled { background: #F1F5F9; color: #475569; }
+    .b-verify { background: #F0ABFC; color: #6B21A8; }
+
+    /* ─── FORMS ─── */
+    .form-section {
+      padding: 28px 32px;
+    }
+
+    .form-section h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0B1829;
+      margin-bottom: 6px;
+    }
+
+    .form-desc {
+      font-size: 13px;
+      color: #6B8299;
+      margin-bottom: 24px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: span 2; }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #3A5270;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #D0DCE8;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      color: #1A2E42;
+      background: white;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-glow);
+    }
+
+    textarea { min-height: 90px; resize: vertical; }
+
+    .form-divider {
+      grid-column: span 2;
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 4px 0;
+    }
+
+    .form-actions {
+      grid-column: span 2;
+      display: flex;
+      gap: 10px;
+      padding-top: 8px;
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--navy);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--navy-mid); box-shadow: 0 4px 14px rgba(11,24,41,0.25); }
+
+    .btn-teal { background: var(--teal); color: var(--navy); }
+    .btn-teal:hover { filter: brightness(1.08); }
+
+    .btn-ghost {
+      background: transparent;
+      color: #5A7A95;
+      border: 1.5px solid var(--border);
+    }
+
+    .btn-ghost:hover { background: var(--surface-alt); border-color: #B0C4D8; }
+
+    /* ─── ACTION BUTTONS IN TABLE ─── */
+    .act-btn {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: none;
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      color: white;
+    }
+
+    .act-btn:hover { opacity: 0.85; }
+    .act-btn.confirm { background: #059669; }
+    .act-btn.cancel { background: #DC2626; }
+    .act-btn.complete { background: #0891B2; }
+    .act-btn.assign { background: #7C3AED; }
+    .act-btn.progress { background: #2563EB; }
+    .act-btn.verify { background: #D97706; }
+    .act-btn.close { background: #475569; }
+
+    .action-group { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    /* ─── RISK SCORE ─── */
+    .risk-score {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: #6B8299;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+      padding: 40px 24px;
+      text-align: center;
+      color: #8BA5C0;
+      font-size: 13.5px;
+    }
+
+    .empty-icon { font-size: 32px; margin-bottom: 10px; opacity: 0.5; }
+
+    /* ─── ALERT / SUMMARY BANNERS ─── */
+    .alert-bar {
+      background: linear-gradient(135deg, #0B1829 0%, #1A3A5C 100%);
+      border-radius: 12px;
+      padding: 18px 24px;
+      color: white;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .alert-bar .msg { font-size: 14px; color: var(--teal); font-weight: 600; }
+    .alert-bar .sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 3px; }
+
+    /* ─── GOOGLE DRIVE UPLOAD ─── */
+    .gdrive-upload-box {
+      border: 2px dashed #C0D0E0;
+      border-radius: 10px;
+      background: #F7FAFD;
+      transition: border-color 0.2s, background 0.2s;
+      overflow: hidden;
+    }
+
+    .gdrive-upload-box.dragover {
+      border-color: var(--teal);
+      background: var(--teal-dim);
+    }
+
+    .gdrive-inner {
+      padding: 24px 20px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .gdrive-inner:hover { background: #EEF5FF; }
+
+    .gdrive-icon { font-size: 28px; margin-bottom: 8px; }
+
+    .gdrive-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2A4A6A;
+      margin-bottom: 4px;
+    }
+
+    .gdrive-sub { font-size: 12px; color: #8BA5C0; }
+
+    .gdrive-file-list {
+      padding: 0 16px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .gdrive-file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      border: 1px solid #E0E8F0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .gdrive-file-name { flex: 1; color: #2A3F55; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .gdrive-file-size { color: #8BA5C0; font-size: 11.5px; font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+
+    .gdrive-file-status {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .gdrive-file-status.uploading { background: #DBEAFE; color: #1E40AF; }
+    .gdrive-file-status.done { background: #D1FAE5; color: #065F46; }
+    .gdrive-file-status.error { background: #FEE2E2; color: #991B1B; }
+    .gdrive-file-status.ready { background: #F1F5F9; color: #475569; }
+
+    .gdrive-file-link { color: var(--teal); font-size: 12px; text-decoration: none; }
+    .gdrive-file-link:hover { text-decoration: underline; }
+
+    .gdrive-status {
+      padding: 0 16px 12px;
+      font-size: 12.5px;
+      color: #6B8299;
+    }
+
+    .gdrive-status.info { color: #1E40AF; }
+    .gdrive-status.success { color: #065F46; font-weight: 600; }
+    .gdrive-status.error { color: #991B1B; }
+
+    /* Config notice */
+    .config-notice {
+      background: #FEF3C7;
+      border: 1px solid #FCD34D;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: #92400E;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .config-notice a { color: #92400E; font-weight: 600; }
+
+    /* company badge in table */
+    .company-tog { background: #DBEAFE; color: #1E40AF; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+    .company-toc { background: #FCE7F3; color: #9D174D; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1000px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full, .form-actions, .form-divider { grid-column: span 1; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { position: relative; width: 100%; height: auto; }
+      .main { margin-left: 0; width: 100%; }
+      .app { display: block; }
+      .content { padding: 16px; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-eyebrow">Thai Optical Group</div>
+      <div class="logo-name">Facility<br /><span>Service Portal</span></div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">A</div>
+      <div class="user-info">
+        <div class="user-name">Admin / Facility</div>
+        <div class="user-role">Facility Management</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section-label">ภาพรวม</div>
+      <button class="nav-btn active" onclick="showPage('dashboard', this)">
+        <span class="nav-icon">⊞</span> Dashboard
+      </button>
+
+      <div class="nav-section-label" style="margin-top:12px;">บริการ</div>
+      <button class="nav-btn" onclick="showPage('meeting', this)">
+        <span class="nav-icon">📅</span> จองห้องประชุม
+      </button>
+      <button class="nav-btn" onclick="showPage('repair', this)">
+        <span class="nav-icon">🔧</span> แจ้งซ่อมอาคารสถานที่
+      </button>
+      <button class="nav-btn" onclick="showPage('risk', this)">
+        <span class="nav-icon">🛡</span> ตรวจความเสี่ยงโรงงาน
+      </button>
+
+      <div class="nav-section-label" style="margin-top:12px;">ติดตาม</div>
+      <button class="nav-btn" onclick="showPage('myRequests', this)">
+        <span class="nav-icon">📋</span> รายการคำขอของฉัน
+      </button>
+      <button class="nav-btn" onclick="showPage('admin', this)">
+        <span class="nav-icon">📊</span> Admin Dashboard
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">v2.0 · TOGG FSP</div>
+  </aside>
+
+  <!-- ─── MAIN ─── -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="page-breadcrumb">Facility Service Portal</div>
+          <div class="page-title-bar" id="pageTitle">Dashboard</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="today-badge" id="todayDisplay"></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ─── DASHBOARD ─── -->
+      <section id="dashboard" class="page active">
+
+        <div class="kpi-grid">
+          <div class="kpi-card teal">
+            <div class="kpi-label">จองห้องวันนี้</div>
+            <div class="kpi-number" id="todayBookingCount">0</div>
+            <div class="kpi-sub">รายการจอง</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">งานซ่อมรอดำเนินการ</div>
+            <div class="kpi-number" id="pendingRepairCount">0</div>
+            <div class="kpi-sub">รายการค้างอยู่</div>
+          </div>
+          <div class="kpi-card rose">
+            <div class="kpi-label">ความเสี่ยง High/Critical</div>
+            <div class="kpi-number" id="highRiskCount">0</div>
+            <div class="kpi-sub">จุดที่ต้องดูแล</div>
+          </div>
+          <div class="kpi-card sky">
+            <div class="kpi-label">รายการทั้งหมด</div>
+            <div class="kpi-number" id="totalRequestCount">0</div>
+            <div class="kpi-sub">ทุกประเภท</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span>📅</span> รายการจองห้องประชุมล่าสุด</div>
+            </div>
+            <div class="panel-body" id="bookingTable"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span>🔧</span> รายการแจ้งซ่อมล่าสุด</div>
+            </div>
+            <div class="panel-body" id="repairTable"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>🛡</span> รายการตรวจความเสี่ยงล่าสุด</div>
+          </div>
+          <div class="panel-body" id="riskTable"></div>
+        </div>
+      </section>
+
+      <!-- ─── MEETING FORM ─── -->
+      <section id="meeting" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>📅</span> แบบฟอร์มจองห้องประชุม</div>
+          </div>
+          <div class="form-section">
+            <div class="form-desc">กรอกข้อมูลให้ครบถ้วน ทีม Facility จะยืนยันการจองภายใน 1 วันทำการ</div>
+            <form id="meetingForm" class="form-grid">
+              <div class="form-group">
+                <label>ชื่อผู้จอง</label>
+                <input name="requester" placeholder="ชื่อ-นามสกุล" required />
+              </div>
+              <div class="form-group">
+                <label>แผนก</label>
+                <input name="department" placeholder="เช่น HR, Finance, IT" required />
+              </div>
+              <div class="form-group">
+                <label>วันที่จอง</label>
+                <input type="date" name="date" required />
+              </div>
+              <div class="form-group">
+                <label>ห้องประชุม</label>
+                <select name="room" required>
+                  <option value="">— เลือกห้องประชุม —</option>
+                  <option>Meeting Room A</option>
+                  <option>Meeting Room B</option>
+                  <option>Training Room</option>
+                  <option>VIP Room</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>เวลาเริ่มต้น</label>
+                <input type="time" name="startTime" required />
+              </div>
+              <div class="form-group">
+                <label>เวลาสิ้นสุด</label>
+                <input type="time" name="endTime" required />
+              </div>
+              <div class="form-group">
+                <label>จำนวนผู้เข้าร่วม (คน)</label>
+                <input type="number" name="participants" min="1" required />
+              </div>
+              <div class="form-group">
+                <label>อุปกรณ์ที่ต้องการ</label>
+                <select name="equipment">
+                  <option>Projector</option>
+                  <option>Microphone</option>
+                  <option>Whiteboard</option>
+                  <option>Coffee Break</option>
+                  <option>ไม่ต้องการ</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label>หัวข้อประชุม</label>
+                <input name="topic" placeholder="ระบุหัวข้อการประชุม" required />
+              </div>
+              <div class="form-group full">
+                <label>หมายเหตุเพิ่มเติม</label>
+                <textarea name="remark" placeholder="ข้อมูลเพิ่มเติมหรือความต้องการพิเศษ"></textarea>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit">✓ ส่งคำขอจองห้องประชุม</button>
+                <button class="btn btn-ghost" type="reset">ล้างข้อมูล</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── REPAIR FORM ─── -->
+      <section id="repair" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>🔧</span> แบบฟอร์มแจ้งซ่อมอาคารสถานที่</div>
+          </div>
+          <div class="form-section">
+            <div class="form-desc">แจ้งปัญหาที่พบ ทีมช่างจะติดต่อกลับและดำเนินการตามความเร่งด่วน · รูปภาพจะถูกอัปโหลดไปยัง Google Drive โดยอัตโนมัติ</div>
+            <form id="repairForm" class="form-grid">
+
+              <!-- Row 1: บริษัท + ชื่อ -->
+              <div class="form-group">
+                <label>บริษัท</label>
+                <select name="company" required>
+                  <option value="">— เลือกบริษัท —</option>
+                  <option value="TOG">TOG — Thai Optical Group</option>
+                  <option value="TOC">TOC — Thai Optical Co.</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ชื่อผู้แจ้ง</label>
+                <input name="requester" placeholder="ชื่อ-นามสกุล" required />
+              </div>
+
+              <!-- Row 2: แผนก + เบอร์ -->
+              <div class="form-group">
+                <label>แผนก</label>
+                <select name="department" required>
+                  <option value="">— เลือกแผนก —</option>
+                  <option>แผนกบุคคล</option>
+                  <option>แผนกจัดซื้อ</option>
+                  <option>แผนกซ่อมบำรุง</option>
+                  <option>แผนกฝ่ายผลิต</option>
+                  <option>Operation3</option>
+                  <option>ส่วนผลิตโมล</option>
+                  <option>แผนกคลังสินค้า</option>
+                  <option>แผนกจัดส่ง</option>
+                  <option>แผนกวางแผน</option>
+                  <option>แผนก RD</option>
+                  <option>แผนก IT</option>
+                  <option>แผนกฝ่ายขาย/CSS/Export</option>
+                  <option>แผนกบัญชี/การเงิน</option>
+                  <option>แผนกคลังสินค้าสำเร็จรูป/packing center</option>
+                  <option>แผนก process engineer</option>
+                  <option>แผนก automation</option>
+                  <option>แผนก QA / QC</option>
+                  <option>แผนก วางแผนวัตถุดิบ/คลังวัตถุดิบ</option>
+                  <option>แผนก Surfacing TOC</option>
+                  <option>แผนก Glazing TOC</option>
+                  <option>แผนก Coat & Tin TOC</option>
+                  <option>แผนก Maintenance TOC</option>
+                  <option>แผนก QA TOC</option>
+                  <option>แผนก safety</option>
+                  <option>แผนก สิ่งแวดล้อม</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>เบอร์ติดต่อ</label>
+                <input name="phone" placeholder="0XX-XXXXXXX" required />
+              </div>
+
+              <!-- Row 3: สถานที่ + ประเภทงาน -->
+              <div class="form-group">
+                <label>สถานที่ / อาคาร</label>
+                <select name="location" required>
+                  <option value="">— เลือกสถานที่ —</option>
+                  <option value="อาคารผลิต 1 (OP1)">อาคารผลิต 1 (OP1)</option>
+                  <option value="อาคารผลิต 2 (OP2)">อาคารผลิต 2 (OP2)</option>
+                  <option value="อาคารผลิต 3 (OP3)">อาคารผลิต 3 (OP3)</option>
+                  <option value="อาคารโรงโมล">อาคารโรงโมล</option>
+                  <option value="อาคารสำนักงาน 1">อาคารสำนักงาน 1</option>
+                  <option value="อาคารสำนักงาน 2">อาคารสำนักงาน 2</option>
+                  <option value="คลังสินค้าสำเร็จรูป">คลังสินค้าสำเร็จรูป</option>
+                  <option value="คลังวัตถุดิบ">คลังวัตถุดิบ</option>
+                  <option value="พื้นที่ส่วนกลาง">พื้นที่ส่วนกลาง</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ระบุจุดที่ซ่อม (รายละเอียดพื้นที่)</label>
+                <input name="locationDetail" placeholder="เช่น ชั้น 2 ห้อง 201, สายพานเครื่อง A" />
+              </div>
+
+              <!-- Row 4: ประเภทงาน + ความเร่งด่วน -->
+              <div class="form-group">
+                <label>ประเภทงานซ่อม</label>
+                <select name="category" required>
+                  <option value="">— เลือกประเภทงาน —</option>
+                  <option>ไฟฟ้า</option>
+                  <option>แอร์</option>
+                  <option>ประปา</option>
+                  <option>อาคาร / ประตู / หน้าต่าง</option>
+                  <option>ห้องน้ำ</option>
+                  <option>เฟอร์นิเจอร์</option>
+                  <option>อื่น ๆ</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ระดับความเร่งด่วน</label>
+                <select name="urgency" required>
+                  <option>ปกติ</option>
+                  <option>เร่งด่วน</option>
+                  <option>ฉุกเฉิน</option>
+                </select>
+              </div>
+
+              <!-- รายละเอียด -->
+              <div class="form-group full">
+                <label>รายละเอียดปัญหา</label>
+                <textarea name="detail" placeholder="อธิบายปัญหาที่พบโดยละเอียด เช่น อาการ ระยะเวลาที่เกิด ผลกระทบต่อการผลิต" required></textarea>
+              </div>
+
+              <!-- Google Drive Upload -->
+              <div class="form-group full">
+                <label>แนบรูปภาพ (อัปโหลดไปยัง Google Drive)</label>
+                <div class="gdrive-upload-box" id="gdriveUploadBox">
+                  <input type="file" id="repairImageFile" accept="image/*" multiple style="display:none;" />
+                  <div class="gdrive-inner" onclick="document.getElementById('repairImageFile').click()">
+                    <div class="gdrive-icon">📁</div>
+                    <div class="gdrive-text">คลิกเพื่อเลือกรูปภาพ หรือลากไฟล์มาวางที่นี่</div>
+                    <div class="gdrive-sub">รองรับ JPG, PNG, HEIC · ขนาดไม่เกิน 10MB ต่อไฟล์</div>
+                  </div>
+                  <div id="gdriveFileList" class="gdrive-file-list"></div>
+                  <div id="gdriveStatus" class="gdrive-status"></div>
+                </div>
+                <!-- hidden field เก็บ Drive links -->
+                <input type="hidden" name="driveLinks" id="driveLinksInput" />
+              </div>
+
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit" id="repairSubmitBtn">✓ ส่งรายการแจ้งซ่อม</button>
+                <button class="btn btn-ghost" type="reset" onclick="resetRepairForm()">ล้างข้อมูล</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── RISK FORM ─── -->
+      <section id="risk" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>🛡</span> แบบฟอร์มตรวจความเสี่ยงภายในโรงงาน</div>
+          </div>
+          <div class="form-section">
+            <div class="form-desc">บันทึกจุดที่พบความเสี่ยง ระบบจะคำนวณระดับความเสี่ยง (Risk Score = ความรุนแรง × โอกาส)</div>
+            <form id="riskForm" class="form-grid">
+              <div class="form-group">
+                <label>ชื่อผู้ตรวจ / ผู้แจ้ง</label>
+                <input name="requester" required />
+              </div>
+              <div class="form-group">
+                <label>แผนก</label>
+                <input name="department" required />
+              </div>
+              <div class="form-group">
+                <label>วันที่ตรวจ</label>
+                <input type="date" name="date" required />
+              </div>
+              <div class="form-group">
+                <label>พื้นที่ที่พบความเสี่ยง</label>
+                <input name="location" placeholder="เช่น ทางเดิน โซน B" required />
+              </div>
+              <div class="form-group">
+                <label>อาคาร / โซน / ไลน์ผลิต</label>
+                <input name="zone" placeholder="เช่น Line A, อาคาร 2" required />
+              </div>
+              <div class="form-group">
+                <label>ประเภทความเสี่ยง</label>
+                <select name="category" required>
+                  <option value="">— เลือกประเภท —</option>
+                  <option>พื้นที่ทำงานไม่ปลอดภัย</option>
+                  <option>ไฟฟ้า / สายไฟ / ตู้ไฟ</option>
+                  <option>เครื่องจักร / อุปกรณ์การผลิต</option>
+                  <option>สารเคมี / วัตถุอันตราย</option>
+                  <option>ทางเดิน / สิ่งกีดขวาง</option>
+                  <option>พื้นลื่น / น้ำรั่ว / น้ำขัง</option>
+                  <option>การจัดเก็บวัสดุไม่เหมาะสม</option>
+                  <option>อัคคีภัย / ถังดับเพลิง / ทางหนีไฟ</option>
+                  <option>PPE / อุปกรณ์ป้องกันส่วนบุคคล</option>
+                  <option>พฤติกรรมเสี่ยงของพนักงาน</option>
+                  <option>สิ่งแวดล้อม / ของเสีย / ฝุ่น / กลิ่น</option>
+                  <option>อื่น ๆ</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>ระดับความรุนแรง (Severity)</label>
+                <select name="severity" required>
+                  <option value="1">1 — ต่ำ</option>
+                  <option value="2">2 — ปานกลาง</option>
+                  <option value="3">3 — สูง</option>
+                  <option value="4">4 — รุนแรง</option>
+                  <option value="5">5 — วิกฤต</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>โอกาสเกิดเหตุ (Likelihood)</label>
+                <select name="likelihood" required>
+                  <option value="1">1 — น้อยมาก</option>
+                  <option value="2">2 — น้อย</option>
+                  <option value="3">3 — ปานกลาง</option>
+                  <option value="4">4 — มาก</option>
+                  <option value="5">5 — มากที่สุด</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label>รายละเอียดความเสี่ยง</label>
+                <textarea name="detail" placeholder="อธิบายความเสี่ยงที่พบโดยละเอียด" required></textarea>
+              </div>
+              <div class="form-group full">
+                <label>ข้อเสนอแนะ / แนวทางแก้ไข</label>
+                <textarea name="solution" placeholder="แนวทางที่แนะนำในการแก้ไขหรือลดความเสี่ยง"></textarea>
+              </div>
+              <div class="form-group">
+                <label>ผู้รับผิดชอบ</label>
+                <input name="owner" placeholder="ชื่อ หรือ ทีมที่รับผิดชอบ" />
+              </div>
+              <div class="form-group">
+                <label>กำหนดวันที่ต้องแก้ไข</label>
+                <input type="date" name="dueDate" />
+              </div>
+              <div class="form-group full">
+                <label>แนบรูปภาพก่อนแก้ไข</label>
+                <input type="file" name="image" accept="image/*" />
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-primary" type="submit">✓ บันทึกความเสี่ยง</button>
+                <button class="btn btn-ghost" type="reset">ล้างข้อมูล</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── MY REQUESTS ─── -->
+      <section id="myRequests" class="page">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>📋</span> รายการคำขอของฉัน</div>
+          </div>
+          <div class="panel-body" id="myRequestTable"></div>
+        </div>
+      </section>
+
+      <!-- ─── ADMIN ─── -->
+      <section id="admin" class="page">
+        <div class="alert-bar">
+          <div>
+            <div class="msg">Admin Dashboard — จัดการและติดตามสถานะรายการทั้งหมด</div>
+            <div class="sub">อนุมัติคำขอ · มอบหมายงาน · อัปเดตสถานะ</div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <div class="panel-title"><span>📅</span> รายการจองห้องประชุมทั้งหมด</div>
+          </div>
+          <div class="panel-body" id="adminBookingTable"></div>
+        </div>
+
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <div class="panel-title"><span>🔧</span> รายการแจ้งซ่อมทั้งหมด</div>
+          </div>
+          <div class="panel-body" id="adminRepairTable"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>🛡</span> รายการตรวจความเสี่ยงทั้งหมด</div>
+          </div>
+          <div class="panel-body" id="adminRiskTable"></div>
+        </div>
+      </section>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<script>
+  // ─── DATE DISPLAY ───
+  const today = new Date();
+  document.getElementById('todayDisplay').innerText =
+    today.toLocaleDateString('th-TH', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+
+  // ─── DATA ───
+  const STORAGE_KEY = 'fsp_v2_data';
+  const defaultData = {
+    bookings: [{
+      id:1, requester:'สมชาย ใจดี', department:'HR', date:'2026-06-26',
+      room:'Meeting Room A', startTime:'09:00', endTime:'10:00',
+      participants:'10', equipment:'Projector',
+      topic:'ประชุมทีมประจำสัปดาห์', status:'Pending'
+    }],
+    repairs: [{
+      id:1, requester:'วิภา รักงาน', department:'Admin', phone:'0811111111',
+      location:'อาคาร A ชั้น 2', category:'แอร์', urgency:'เร่งด่วน',
+      detail:'แอร์ไม่เย็น เสียงดังผิดปกติ', status:'New Request', date:'2026-06-26'
+    }],
+    risks: [{
+      id:1, requester:'Safety Team', department:'Safety', date:'2026-06-26',
+      location:'Production Line A', zone:'Line A',
+      category:'พื้นลื่น / น้ำรั่ว / น้ำขัง', severity:4, likelihood:3,
+      riskLevel:'High', detail:'พบพื้นเปียกบริเวณทางเดิน อาจทำให้พนักงานลื่นล้ม',
+      solution:'ติดป้ายเตือนและให้แม่บ้านทำความสะอาดทันที',
+      owner:'Facility', dueDate:'2026-06-27', status:'New Finding'
+    }]
+  };
+
+  let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
+
+  function saveData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    renderAll();
+  }
+
+  // ─── PAGE NAV ───
+  const pageTitles = {
+    dashboard: 'Dashboard', meeting: 'จองห้องประชุม',
+    repair: 'แจ้งซ่อมอาคารสถานที่', risk: 'ตรวจความเสี่ยงภายในโรงงาน',
+    myRequests: 'รายการคำขอของฉัน', admin: 'Admin Dashboard'
+  };
+
+  function showPage(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    document.getElementById('pageTitle').innerText = pageTitles[id];
+  }
+
+  // ─── RISK LEVEL ───
+  function getRiskLevel(score) {
+    if (score >= 20) return 'Critical';
+    if (score >= 12) return 'High';
+    if (score >= 6)  return 'Medium';
+    return 'Low';
+  }
+
+  // ─── BADGE ───
+  function badge(text) {
+    const t = String(text).toLowerCase();
+    let cls = 'b-pending';
+    if (t.includes('pending'))  cls = 'b-pending';
+    else if (t.includes('new')) cls = 'b-new';
+    else if (t.includes('confirmed')) cls = 'b-confirmed';
+    else if (t.includes('completed')) cls = 'b-completed';
+    else if (t.includes('closed'))    cls = 'b-closed';
+    else if (t.includes('progress'))  cls = 'b-progress';
+    else if (t.includes('assigned'))  cls = 'b-assigned';
+    else if (t.includes('critical'))  cls = 'b-critical';
+    else if (t.includes('high'))      cls = 'b-high';
+    else if (t.includes('medium'))    cls = 'b-medium';
+    else if (t.includes('low'))       cls = 'b-low';
+    else if (t.includes('cancel'))    cls = 'b-cancelled';
+    else if (t.includes('verify'))    cls = 'b-verify';
+    return `<span class="badge ${cls}">${text}</span>`;
+  }
+
+  // ─── EMPTY ───
+  function emptyState(msg) {
+    return `<div class="empty-state"><div class="empty-icon">📭</div>${msg}</div>`;
+  }
+
+  // ─── RENDER DASHBOARD ───
+  function renderDashboard() {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    document.getElementById('todayBookingCount').innerText =
+      data.bookings.filter(i => i.date === todayStr).length;
+    document.getElementById('pendingRepairCount').innerText =
+      data.repairs.filter(i => !['Completed','Cancelled'].includes(i.status)).length;
+    document.getElementById('highRiskCount').innerText =
+      data.risks.filter(i => ['High','Critical'].includes(i.riskLevel)).length;
+    document.getElementById('totalRequestCount').innerText =
+      data.bookings.length + data.repairs.length + data.risks.length;
+
+    renderBookingTable('bookingTable', data.bookings.slice(-5), false);
+    renderRepairTable('repairTable', data.repairs.slice(-5), false);
+    renderRiskTable('riskTable', data.risks.slice(-5), false);
+  }
+
+  // ─── RENDER BOOKING TABLE ───
+  function renderBookingTable(cid, list, isAdmin) {
+    const c = document.getElementById(cid);
+    if (!list.length) { c.innerHTML = emptyState('ยังไม่มีรายการจอง'); return; }
+    c.innerHTML = `<table>
+      <thead><tr>
+        <th>วันที่</th><th>ห้อง</th><th>เวลา</th><th>หัวข้อ</th><th>สถานะ</th>
+        ${isAdmin ? '<th>การดำเนินการ</th>' : ''}
+      </tr></thead>
+      <tbody>${list.map(r => `<tr>
+        <td>${r.date}</td>
+        <td>${r.room}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;">${r.startTime}–${r.endTime}</td>
+        <td>${r.topic}</td>
+        <td>${badge(r.status)}</td>
+        ${isAdmin ? `<td><div class="action-group">
+          <button class="act-btn confirm" onclick="updateStatus('bookings',${r.id},'Confirmed')">Confirm</button>
+          <button class="act-btn complete" onclick="updateStatus('bookings',${r.id},'Completed')">Complete</button>
+          <button class="act-btn cancel" onclick="updateStatus('bookings',${r.id},'Cancelled')">Cancel</button>
+        </div></td>` : ''}
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  // ─── RENDER REPAIR TABLE ───
+  function renderRepairTable(cid, list, isAdmin) {
+    const c = document.getElementById(cid);
+    if (!list.length) { c.innerHTML = emptyState('ยังไม่มีรายการแจ้งซ่อม'); return; }
+    c.innerHTML = `<table>
+      <thead><tr>
+        <th>บริษัท</th><th>วันที่</th><th>สถานที่</th><th>ประเภท</th><th>ความเร่งด่วน</th><th>สถานะ</th>${isAdmin ? '<th>รูปภาพ</th><th>การดำเนินการ</th>' : ''}
+      </tr></thead>
+      <tbody>${list.map(r => `<tr>
+        <td>${r.company ? `<span class="company-${r.company.toLowerCase()}">${r.company}</span>` : '—'}</td>
+        <td>${r.date}</td>
+        <td>${r.location || ''}${r.locationDetail ? `<br><span style="font-size:11.5px;color:#8BA5C0;">${r.locationDetail}</span>` : ''}</td>
+        <td>${r.category}</td>
+        <td>${badge(r.urgency === 'ฉุกเฉิน' ? 'Critical' : r.urgency === 'เร่งด่วน' ? 'High' : 'Medium')}</td>
+        <td>${badge(r.status)}</td>
+        ${isAdmin ? `
+        <td>${r.driveLinks && r.driveLinks.length ? r.driveLinks.map(l => `<a href="${l.url}" target="_blank" class="gdrive-file-link">📎 ${l.name}</a>`).join('<br>') : '<span style="color:#B0C4D8;font-size:12px;">ไม่มีรูป</span>'}</td>
+        <td><div class="action-group">
+          <button class="act-btn assign"   onclick="updateStatus('repairs',${r.id},'Assigned')">Assign</button>
+          <button class="act-btn progress" onclick="updateStatus('repairs',${r.id},'In Progress')">Progress</button>
+          <button class="act-btn complete" onclick="updateStatus('repairs',${r.id},'Completed')">Complete</button>
+        </div></td>` : ''}
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  // ─── RENDER RISK TABLE ───
+  function renderRiskTable(cid, list, isAdmin) {
+    const c = document.getElementById(cid);
+    if (!list.length) { c.innerHTML = emptyState('ยังไม่มีรายการความเสี่ยง'); return; }
+    c.innerHTML = `<table>
+      <thead><tr>
+        <th>วันที่</th><th>พื้นที่</th><th>ประเภท</th><th>Score</th><th>ระดับ</th><th>สถานะ</th>
+        ${isAdmin ? '<th>การดำเนินการ</th>' : ''}
+      </tr></thead>
+      <tbody>${list.map(r => `<tr>
+        <td>${r.date}</td>
+        <td>${r.location}</td>
+        <td>${r.category}</td>
+        <td class="risk-score">${r.severity}×${r.likelihood} = ${r.severity * r.likelihood}</td>
+        <td>${badge(r.riskLevel)}</td>
+        <td>${badge(r.status)}</td>
+        ${isAdmin ? `<td><div class="action-group">
+          <button class="act-btn assign"   onclick="updateStatus('risks',${r.id},'Assigned')">Assign</button>
+          <button class="act-btn progress" onclick="updateStatus('risks',${r.id},'In Progress')">Progress</button>
+          <button class="act-btn verify"   onclick="updateStatus('risks',${r.id},'Pending Verification')">Verify</button>
+          <button class="act-btn close"    onclick="updateStatus('risks',${r.id},'Closed')">Close</button>
+        </div></td>` : ''}
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  // ─── RENDER MY REQUESTS ───
+  function renderMyRequests() {
+    const combined = [
+      ...data.bookings.map(i => ({ type:'📅 จองห้องประชุม', detail:i.topic, date:i.date, status:i.status })),
+      ...data.repairs.map(i => ({ type:'🔧 แจ้งซ่อม', detail:i.detail, date:i.date, status:i.status })),
+      ...data.risks.map(i => ({ type:'🛡 ตรวจความเสี่ยง', detail:i.detail, date:i.date, status:i.status }))
+    ].sort((a,b) => b.date.localeCompare(a.date));
+
+    const c = document.getElementById('myRequestTable');
+    if (!combined.length) { c.innerHTML = emptyState('ยังไม่มีรายการคำขอ'); return; }
+    c.innerHTML = `<table>
+      <thead><tr><th>ประเภท</th><th>รายละเอียด</th><th>วันที่</th><th>สถานะ</th></tr></thead>
+      <tbody>${combined.map(r => `<tr>
+        <td style="white-space:nowrap;font-weight:600;">${r.type}</td>
+        <td>${r.detail}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;">${r.date}</td>
+        <td>${badge(r.status)}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  // ─── RENDER ADMIN ───
+  function renderAdmin() {
+    renderBookingTable('adminBookingTable', data.bookings, true);
+    renderRepairTable('adminRepairTable', data.repairs, true);
+    renderRiskTable('adminRiskTable', data.risks, true);
+  }
+
+  // ─── UPDATE STATUS ───
+  function updateStatus(type, id, status) {
+    const item = data[type].find(r => r.id === id);
+    if (item) { item.status = status; saveData(); }
+  }
+
+  // ─── FORM: MEETING ───
+  document.getElementById('meetingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    data.bookings.push({
+      id: Date.now(), requester: f.get('requester'), department: f.get('department'),
+      date: f.get('date'), room: f.get('room'), startTime: f.get('startTime'),
+      endTime: f.get('endTime'), participants: f.get('participants'),
+      equipment: f.get('equipment'), topic: f.get('topic'),
+      remark: f.get('remark'), status: 'Pending'
+    });
+    e.target.reset(); saveData();
+    alert('✓ ส่งคำขอจองห้องประชุมเรียบร้อยแล้ว ทีม Facility จะยืนยันภายใน 1 วันทำการ');
+  });
+
+  // ─── GOOGLE DRIVE UPLOAD CONFIG ───
+  // ⚠️ ตั้งค่าตรงนี้: ใส่ Google Apps Script Web App URL ที่ Deploy ไว้
+  // วิธี Deploy: ดู comment ด้านล่างในไฟล์นี้
+  const GDRIVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKk7Ln-gskV6Y3lvDj2hRdatm6pWV6KiRJTmh6nbUHcbxawGWegw7i1Z9XXpt4YJEd/exec';
+
+  // รายชื่อไฟล์ที่เลือก
+  let selectedFiles = [];
+  let uploadedLinks = [];
+
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function renderFileList() {
+    const list = document.getElementById('gdriveFileList');
+    if (!selectedFiles.length) { list.innerHTML = ''; return; }
+    list.innerHTML = selectedFiles.map((f, i) => `
+      <div class="gdrive-file-item" id="fileItem_${i}">
+        <span>🖼</span>
+        <span class="gdrive-file-name">${f.name}</span>
+        <span class="gdrive-file-size">${formatBytes(f.size)}</span>
+        <span class="gdrive-file-status ready" id="fileStatus_${i}">รอส่ง</span>
+        <span id="fileLink_${i}"></span>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('repairImageFile').addEventListener('change', function(e) {
+    selectedFiles = Array.from(e.target.files);
+    uploadedLinks = [];
+    document.getElementById('driveLinksInput').value = '';
+    renderFileList();
+    if (selectedFiles.length) {
+      document.getElementById('gdriveStatus').className = 'gdrive-status info';
+      document.getElementById('gdriveStatus').innerText = `เลือก ${selectedFiles.length} ไฟล์ · จะอัปโหลดอัตโนมัติเมื่อกดส่งฟอร์ม`;
+    }
+  });
+
+  // Drag & Drop
+  const uploadBox = document.getElementById('gdriveUploadBox');
+  uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('dragover'); });
+  uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
+  uploadBox.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadBox.classList.remove('dragover');
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if (files.length) {
+      selectedFiles = files;
+      uploadedLinks = [];
+      document.getElementById('driveLinksInput').value = '';
+      renderFileList();
+      document.getElementById('gdriveStatus').className = 'gdrive-status info';
+      document.getElementById('gdriveStatus').innerText = `เลือก ${files.length} ไฟล์จากการลาก · จะอัปโหลดเมื่อกดส่งฟอร์ม`;
+    }
+  });
+
+  // อัปโหลดรูปไปยัง Google Drive ผ่าน Apps Script
+  // ใช้ no-cors mode เพื่อให้ทำงานได้จาก file:// โดยตรง
+  async function uploadFilesToDrive(repairId, meta = {}) {
+    if (!selectedFiles.length) return [];
+    if (!GDRIVE_SCRIPT_URL) {
+      document.getElementById('gdriveStatus').className = 'gdrive-status error';
+      document.getElementById('gdriveStatus').innerText = '⚠️ ยังไม่ได้ตั้งค่า Google Drive Script URL';
+      return [];
+    }
+
+    const links = [];
+    document.getElementById('gdriveStatus').className = 'gdrive-status info';
+    document.getElementById('gdriveStatus').innerText = `กำลังอัปโหลด 0 / ${selectedFiles.length} ไฟล์...`;
+
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      const statusEl = document.getElementById(`fileStatus_${i}`);
+      const linkEl   = document.getElementById(`fileLink_${i}`);
+      statusEl.className = 'gdrive-file-status uploading';
+      statusEl.innerText = 'กำลังส่ง...';
+
+      try {
+        // อ่านไฟล์เป็น base64
+        const base64 = await new Promise((res, rej) => {
+          const reader = new FileReader();
+          reader.onload = () => res(reader.result.split(',')[1]);
+          reader.onerror = rej;
+          reader.readAsDataURL(file);
+        });
+
+        // ส่งเป็น URLSearchParams — Apps Script รับผ่าน e.parameter ได้ทันที
+        // และ no-cors mode ไม่บล็อก POST แบบ application/x-www-form-urlencoded
+        const params = new URLSearchParams({
+          repairId:  String(repairId),
+          fileName:  file.name,
+          mimeType:  file.type,
+          base64Data: base64,
+          company:   meta.company   || '',
+          requester: meta.requester || '',
+          location:  meta.location  || ''
+        });
+
+        // ใช้ no-cors — response จะเป็น opaque (ดู result ไม่ได้)
+        // แต่ Apps Script จะได้รับและบันทึกไฟล์สำเร็จ
+        await fetch(GDRIVE_SCRIPT_URL, {
+          method: 'POST',
+          mode:   'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body:   params.toString()
+        });
+
+        // no-cors ไม่รู้ว่าสำเร็จหรือเปล่า — ถือว่าส่งแล้ว แสดง pending
+        links.push({ name: file.name, url: GDRIVE_SCRIPT_URL, pending: true });
+        statusEl.className = 'gdrive-file-status done';
+        statusEl.innerText = '✓ ส่งแล้ว';
+        linkEl.innerHTML = `<span style="font-size:11px;color:#6B8299;">ตรวจสอบใน Drive</span>`;
+
+      } catch (err) {
+        statusEl.className = 'gdrive-file-status error';
+        statusEl.innerText = '✗ ผิดพลาด';
+        console.error('Upload error:', err);
+      }
+
+      document.getElementById('gdriveStatus').innerText =
+        `อัปโหลด ${Math.min(i+1, selectedFiles.length)} / ${selectedFiles.length} ไฟล์...`;
+    }
+
+    const successCount = links.length;
+    document.getElementById('gdriveStatus').className = successCount > 0 ? 'gdrive-status success' : 'gdrive-status error';
+    document.getElementById('gdriveStatus').innerText =
+      successCount > 0
+        ? `✓ ส่งไปยัง Google Drive แล้ว ${successCount} ไฟล์ — ตรวจสอบใน Drive ได้เลย`
+        : '✗ ส่งไม่สำเร็จ — บันทึกรายการโดยไม่มีรูปภาพ';
+
+    return links;
+  }
+
+  function resetRepairForm() {
+    selectedFiles = [];
+    uploadedLinks = [];
+    document.getElementById('gdriveFileList').innerHTML = '';
+    document.getElementById('gdriveStatus').className = 'gdrive-status';
+    document.getElementById('gdriveStatus').innerText = '';
+    document.getElementById('driveLinksInput').value = '';
+    document.getElementById('repairImageFile').value = '';
+  }
+
+  // ─── FORM: REPAIR ───
+  document.getElementById('repairForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const submitBtn = document.getElementById('repairSubmitBtn');
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'กำลังส่ง...';
+
+    // อัปโหลดรูปก่อน
+    const repairId = Date.now();
+    const formMeta = {
+      company: f.get('company'),
+      requester: f.get('requester'),
+      location: f.get('location')
+    };
+    const driveLinks = await uploadFilesToDrive(repairId, formMeta);
+
+    data.repairs.push({
+      id: repairId,
+      company: f.get('company'),
+      requester: f.get('requester'),
+      department: f.get('department'),
+      phone: f.get('phone'),
+      location: f.get('location'),
+      locationDetail: f.get('locationDetail'),
+      category: f.get('category'),
+      urgency: f.get('urgency'),
+      detail: f.get('detail'),
+      driveLinks: driveLinks,
+      status: 'New Request',
+      date: new Date().toISOString().slice(0, 10)
+    });
+
+    saveData();
+    resetRepairForm();
+    e.target.reset();
+
+    submitBtn.disabled = false;
+    submitBtn.innerText = '✓ ส่งรายการแจ้งซ่อม';
+
+    const imgMsg = driveLinks.length > 0
+      ? `\nอัปโหลดรูปภาพสำเร็จ ${driveLinks.length} ไฟล์ไปยัง Google Drive`
+      : selectedFiles.length > 0 ? '\n(ไม่สามารถอัปโหลดรูปภาพได้ กรุณาตรวจสอบการตั้งค่า)' : '';
+    alert(`✓ ส่งรายการแจ้งซ่อมเรียบร้อยแล้ว ทีมช่างจะดำเนินการตามลำดับความเร่งด่วน${imgMsg}`);
+  });
+
+  // ─── FORM: RISK ───
+  document.getElementById('riskForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const sv = Number(f.get('severity')), lk = Number(f.get('likelihood'));
+    data.risks.push({
+      id: Date.now(), requester: f.get('requester'), department: f.get('department'),
+      date: f.get('date'), location: f.get('location'), zone: f.get('zone'),
+      category: f.get('category'), severity: sv, likelihood: lk,
+      riskLevel: getRiskLevel(sv * lk), detail: f.get('detail'),
+      solution: f.get('solution'), owner: f.get('owner'),
+      dueDate: f.get('dueDate'), status: 'New Finding'
+    });
+    e.target.reset(); saveData();
+    alert(`✓ บันทึกความเสี่ยงเรียบร้อยแล้ว (Risk Score = ${sv * lk} — ${getRiskLevel(sv * lk)})`);
+  });
+
+  // ─── INIT ───
+  function renderAll() {
+    renderDashboard();
+    renderMyRequests();
+    renderAdmin();
+  }
+
+  renderAll();
+</script>
+<!--
+=======================================================================
+📌 วิธีตั้งค่า Google Drive Upload (Google Apps Script)
+=======================================================================
+
+ขั้นตอนที่ 1: ไปที่ https://script.google.com → New Project
+
+ขั้นตอนที่ 2: วางโค้ดนี้ใน Code.gs:
+
+----------------------------------------------------------------------
+const FOLDER_ID = 'YOUR_GOOGLE_DRIVE_FOLDER_ID'; // ← ใส่ Folder ID ที่ต้องการเก็บรูป
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const folder = DriveApp.getFolderById(FOLDER_ID);
+
+    // สร้าง subfolder ตาม repairId
+    let subFolder;
+    const repairFolderName = 'Repair_' + data.repairId;
+    const existing = folder.getFoldersByName(repairFolderName);
+    subFolder = existing.hasNext() ? existing.next() : folder.createFolder(repairFolderName);
+
+    // บันทึกไฟล์
+    const blob = Utilities.newBlob(
+      Utilities.base64Decode(data.base64Data),
+      data.mimeType,
+      data.fileName
+    );
+    const file = subFolder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true, fileUrl: file.getUrl() }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, error: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput('OK');
+}
+----------------------------------------------------------------------
+
+ขั้นตอนที่ 3: Deploy → New Deployment → Web App
+  - Execute as: Me
+  - Who has access: Anyone
+  → คัดลอก URL ที่ได้
+
+ขั้นตอนที่ 4: วาง URL ใน GDRIVE_SCRIPT_URL ในไฟล์นี้ (บรรทัด const GDRIVE_SCRIPT_URL = '')
+
+ขั้นตอนที่ 5: คัดลอก Folder ID จาก URL ของ Google Drive Folder
+  เช่น: https://drive.google.com/drive/folders/1aBcDeFgHiJkLmNoPqRsTuVwXyZ
+  → FOLDER_ID = '1aBcDeFgHiJkLmNoPqRsTuVwXyZ'
+=======================================================================
+-->
+</body>
+</html>

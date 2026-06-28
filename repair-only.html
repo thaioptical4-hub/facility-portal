@@ -624,13 +624,35 @@
 
     const f = new FormData(e.target);
     const repairId = Date.now();
+
+    // รวมข้อมูลทั้งหมด
     const meta = {
-      company: f.get('company'),
-      requester: f.get('requester'),
-      location: f.get('location')
+      repairId:       String(repairId),
+      company:        f.get('company')        || '',
+      requester:      f.get('requester')      || '',
+      department:     f.get('department')     || '',
+      phone:          f.get('phone')          || '',
+      location:       f.get('location')       || '',
+      locationDetail: f.get('locationDetail') || '',
+      category:       f.get('category')       || '',
+      urgency:        selectedUrgency         || '',
+      detail:         f.get('detail')         || ''
     };
 
-    // อัปโหลดรูป
+    // ─── ส่งข้อมูลฟอร์มไปยัง Apps Script เสมอ (ไม่ว่าจะมีรูปหรือไม่) ───
+    if (GDRIVE_SCRIPT_URL) {
+      try {
+        const params = new URLSearchParams(meta);
+        await fetch(GDRIVE_SCRIPT_URL, {
+          method:  'POST',
+          mode:    'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body:    params.toString()
+        });
+      } catch(err) { console.error('Form submit error:', err); }
+    }
+
+    // อัปโหลดรูป (ถ้ามี)
     await uploadFiles(repairId, meta);
 
     // บันทึกใน localStorage (สำหรับ Admin ดูใน facility-portal)

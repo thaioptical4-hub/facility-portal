@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แจ้งซ่อมอาคารสถานที่ — Thai Optical Group</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #0B1829;
+      --teal: #00D4AA;
+      --teal-dim: rgba(0,212,170,0.10);
+      --teal-glow: rgba(0,212,170,0.22);
+      --border: #D8E4EF;
+      --shadow: 0 2px 16px rgba(11,24,41,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      background: #EEF3F8;
+      color: #1A2E42;
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ─── */
+    .header {
+      background: var(--navy);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-icon {
+      width: 40px; height: 40px;
+      background: var(--teal-dim);
+      border: 2px solid var(--teal);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+
+    .header-text { min-width: 0; }
+
+    .header-eyebrow {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 2px;
+    }
+
+    .header-title {
+      font-size: 17px; font-weight: 700;
+      color: #E8EFF7; line-height: 1.2;
+    }
+
+    /* ─── CONTENT ─── */
+    .content {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    /* ─── CARD ─── */
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #F0F4F8;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .card-title {
+      font-size: 15px; font-weight: 700; color: #0B1829;
+    }
+
+    .card-body { padding: 20px; }
+
+    /* ─── FORM ─── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: span 2; }
+
+    label {
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.03em; color: #3A5270;
+    }
+
+    .required::after { content: ' *'; color: #F43F5E; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1.5px solid #D0DCE8;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      color: #1A2E42;
+      background: white;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-glow);
+    }
+
+    textarea { min-height: 100px; resize: vertical; }
+
+    /* ─── URGENCY PILLS ─── */
+    .urgency-group {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+
+    .urgency-pill {
+      flex: 1; min-width: 80px;
+      padding: 10px 8px;
+      border: 1.5px solid #D0DCE8;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: #5A7A95;
+      background: white;
+      user-select: none;
+    }
+
+    .urgency-pill:hover { border-color: #8BA5C0; }
+
+    .urgency-pill.selected-normal   { border-color: #059669; background: #D1FAE5; color: #065F46; }
+    .urgency-pill.selected-urgent   { border-color: #D97706; background: #FEF3C7; color: #92400E; }
+    .urgency-pill.selected-critical { border-color: #DC2626; background: #FEE2E2; color: #991B1B; }
+
+    .pill-icon { font-size: 18px; display: block; margin-bottom: 3px; }
+
+    /* ─── UPLOAD BOX ─── */
+    .upload-box {
+      border: 2px dashed #C0D0E0;
+      border-radius: 10px;
+      background: #F7FAFD;
+      overflow: hidden;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .upload-box.dragover {
+      border-color: var(--teal);
+      background: var(--teal-dim);
+    }
+
+    .upload-inner {
+      padding: 22px 16px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .upload-inner:hover { background: #EEF5FF; }
+    .upload-icon { font-size: 28px; margin-bottom: 6px; }
+    .upload-text { font-size: 14px; font-weight: 600; color: #2A4A6A; margin-bottom: 3px; }
+    .upload-sub { font-size: 12px; color: #8BA5C0; }
+
+    .file-list { padding: 0 14px 10px; display: flex; flex-direction: column; gap: 6px; }
+
+    .file-item {
+      display: flex; align-items: center; gap: 8px;
+      background: white; border: 1px solid #E0E8F0;
+      border-radius: 8px; padding: 8px 12px; font-size: 13px;
+    }
+
+    .file-name { flex: 1; color: #2A3F55; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .file-size { color: #8BA5C0; font-size: 11.5px; font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+
+    .file-status {
+      font-size: 11.5px; font-weight: 600;
+      padding: 3px 8px; border-radius: 4px; white-space: nowrap;
+    }
+
+    .status-ready    { background: #F1F5F9; color: #475569; }
+    .status-sending  { background: #DBEAFE; color: #1E40AF; }
+    .status-done     { background: #D1FAE5; color: #065F46; }
+    .status-error    { background: #FEE2E2; color: #991B1B; }
+
+    .upload-status {
+      padding: 0 14px 12px;
+      font-size: 12.5px; color: #6B8299;
+    }
+
+    .upload-status.success { color: #065F46; font-weight: 600; }
+    .upload-status.error   { color: #991B1B; }
+    .upload-status.info    { color: #1E40AF; }
+
+    /* ─── SUBMIT BUTTON ─── */
+    .submit-btn {
+      width: 100%;
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-top: 4px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .submit-btn:hover:not(:disabled) { background: #1A3A5C; box-shadow: 0 4px 14px rgba(11,24,41,0.25); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ─── SUCCESS STATE ─── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .success-screen.show { display: block; }
+
+    .success-icon {
+      width: 72px; height: 72px;
+      background: #D1FAE5;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 16px;
+    }
+
+    .success-title {
+      font-size: 20px; font-weight: 700;
+      color: #0B1829; margin-bottom: 8px;
+    }
+
+    .success-desc {
+      font-size: 14px; color: #6B8299;
+      line-height: 1.7; margin-bottom: 24px;
+    }
+
+    .success-id {
+      background: #F7FAFD;
+      border: 1px solid #E0E8F0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 13px; color: #3A5270;
+    }
+
+    .success-id span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 600; color: #0B1829;
+    }
+
+    .new-btn {
+      background: var(--teal);
+      color: var(--navy);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+
+    .new-btn:hover { filter: brightness(1.08); }
+
+    /* ─── INFO STRIP ─── */
+    .info-strip {
+      background: var(--teal-dim);
+      border: 1px solid rgba(0,212,170,0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px; color: #1A5C4A;
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      text-align: center;
+      font-size: 12px; color: #94A3B8;
+      padding-top: 8px;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 500px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: span 1; }
+      .header-title { font-size: 15px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-icon">🔧</div>
+    <div class="header-text">
+      <div class="header-eyebrow">Thai Optical Group</div>
+      <div class="header-title">แจ้งซ่อมอาคารสถานที่</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- INFO STRIP -->
+    <div class="info-strip">
+      📋 กรอกข้อมูลให้ครบถ้วน ทีมช่างจะติดต่อกลับและดำเนินการตามความเร่งด่วน
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="card" id="formCard">
+      <div class="card-header">
+        <div class="card-title">📝 ข้อมูลการแจ้งซ่อม</div>
+      </div>
+      <div class="card-body">
+        <form id="repairForm" class="form-grid">
+
+          <!-- บริษัท -->
+          <div class="form-group">
+            <label class="required">บริษัท</label>
+            <select name="company" required>
+              <option value="">— เลือกบริษัท —</option>
+              <option value="TOG">TOG — Thai Optical Group</option>
+              <option value="TOC">TOC — Thai Optical Co.</option>
+            </select>
+          </div>
+
+          <!-- ชื่อผู้แจ้ง -->
+          <div class="form-group">
+            <label class="required">ชื่อผู้แจ้ง</label>
+            <input name="requester" placeholder="ชื่อ-นามสกุล" required />
+          </div>
+
+          <!-- แผนก -->
+          <div class="form-group">
+            <label class="required">แผนก</label>
+            <select name="department" required>
+              <option value="">— เลือกแผนก —</option>
+              <option>แผนกบุคคล</option>
+              <option>แผนกจัดซื้อ</option>
+              <option>แผนกซ่อมบำรุง</option>
+              <option>แผนกฝ่ายผลิต</option>
+              <option>Operation3</option>
+              <option>ส่วนผลิตโมล</option>
+              <option>แผนกคลังสินค้า</option>
+              <option>แผนกจัดส่ง</option>
+              <option>แผนกวางแผน</option>
+              <option>แผนก RD</option>
+              <option>แผนก IT</option>
+              <option>แผนกฝ่ายขาย/CSS/Export</option>
+              <option>แผนกบัญชี/การเงิน</option>
+              <option>แผนกคลังสินค้าสำเร็จรูป/packing center</option>
+              <option>แผนก process engineer</option>
+              <option>แผนก automation</option>
+              <option>แผนก QA / QC</option>
+              <option>แผนก วางแผนวัตถุดิบ/คลังวัตถุดิบ</option>
+              <option>แผนก Surfacing TOC</option>
+              <option>แผนก Glazing TOC</option>
+              <option>แผนก Coat & Tin TOC</option>
+              <option>แผนก Maintenance TOC</option>
+              <option>แผนก QA TOC</option>
+              <option>แผนก safety</option>
+              <option>แผนก สิ่งแวดล้อม</option>
+            </select>
+          </div>
+
+          <!-- เบอร์ติดต่อ -->
+          <div class="form-group">
+            <label class="required">เบอร์ติดต่อ</label>
+            <input name="phone" placeholder="0XX-XXXXXXX หรือ ต่อภายใน" required />
+          </div>
+
+          <!-- สถานที่ -->
+          <div class="form-group">
+            <label class="required">สถานที่ / อาคาร</label>
+            <select name="location" required>
+              <option value="">— เลือกสถานที่ —</option>
+              <option>อาคารผลิต 1 (OP1)</option>
+              <option>อาคารผลิต 2 (OP2)</option>
+              <option>อาคารผลิต 3 (OP3)</option>
+              <option>อาคารโรงโมล</option>
+              <option>อาคารสำนักงาน 1</option>
+              <option>อาคารสำนักงาน 2</option>
+              <option>คลังสินค้าสำเร็จรูป</option>
+              <option>คลังวัตถุดิบ</option>
+              <option>พื้นที่ส่วนกลาง</option>
+            </select>
+          </div>
+
+          <!-- จุดที่ซ่อม -->
+          <div class="form-group">
+            <label>ระบุจุดที่ซ่อม</label>
+            <input name="locationDetail" placeholder="เช่น ชั้น 2, ห้อง 201, สายพาน A" />
+          </div>
+
+          <!-- ประเภทงาน -->
+          <div class="form-group">
+            <label class="required">ประเภทงานซ่อม</label>
+            <select name="category" required>
+              <option value="">— เลือกประเภทงาน —</option>
+              <option>ไฟฟ้า</option>
+              <option>แอร์</option>
+              <option>ประปา</option>
+              <option>อาคาร / ประตู / หน้าต่าง</option>
+              <option>ห้องน้ำ</option>
+              <option>เฟอร์นิเจอร์</option>
+              <option>อื่น ๆ</option>
+            </select>
+          </div>
+
+          <!-- ความเร่งด่วน -->
+          <div class="form-group">
+            <label class="required">ระดับความเร่งด่วน</label>
+            <div class="urgency-group">
+              <div class="urgency-pill" data-value="ปกติ" onclick="selectUrgency(this,'selected-normal')">
+                <span class="pill-icon">🟢</span>ปกติ
+              </div>
+              <div class="urgency-pill" data-value="เร่งด่วน" onclick="selectUrgency(this,'selected-urgent')">
+                <span class="pill-icon">🟡</span>เร่งด่วน
+              </div>
+              <div class="urgency-pill" data-value="ฉุกเฉิน" onclick="selectUrgency(this,'selected-critical')">
+                <span class="pill-icon">🔴</span>ฉุกเฉิน
+              </div>
+            </div>
+            <input type="hidden" name="urgency" id="urgencyInput" />
+          </div>
+
+          <!-- รายละเอียด -->
+          <div class="form-group full">
+            <label class="required">รายละเอียดปัญหา</label>
+            <textarea name="detail" placeholder="อธิบายปัญหาที่พบโดยละเอียด เช่น อาการ ระยะเวลาที่เกิด ผลกระทบต่อการทำงาน" required></textarea>
+          </div>
+
+          <!-- Upload -->
+          <div class="form-group full">
+            <label>แนบรูปภาพ (อัปโหลดไปยัง Google Drive อัตโนมัติ)</label>
+            <div class="upload-box" id="uploadBox">
+              <input type="file" id="imageFile" accept="image/*" multiple style="display:none;" />
+              <div class="upload-inner" onclick="document.getElementById('imageFile').click()">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">แตะเพื่อเลือกรูปภาพ หรือลากมาวาง</div>
+                <div class="upload-sub">JPG, PNG, HEIC · ไม่เกิน 10MB ต่อไฟล์</div>
+              </div>
+              <div class="file-list" id="fileList"></div>
+              <div class="upload-status" id="uploadStatus"></div>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="form-group full">
+            <button class="submit-btn" type="submit" id="submitBtn">
+              ✓ ส่งรายการแจ้งซ่อม
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div class="card" id="successCard" style="display:none;">
+      <div class="success-screen show">
+        <div class="success-icon">✅</div>
+        <div class="success-title">ส่งรายการแจ้งซ่อมสำเร็จ!</div>
+        <div class="success-desc">
+          ทีมช่างได้รับข้อมูลแล้ว<br/>จะติดต่อกลับและดำเนินการตามลำดับความเร่งด่วน
+        </div>
+        <div class="success-id">
+          หมายเลขอ้างอิง: <span id="refNumber"></span>
+        </div>
+        <button class="new-btn" onclick="resetForm()">+ แจ้งซ่อมรายการใหม่</button>
+      </div>
+    </div>
+
+    <div class="footer">Thai Optical Group · Facility Service Portal</div>
+  </div>
+
+<script>
+  const GDRIVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKk7Ln-gskV6Y3lvDj2hRdatm6pWV6KiRJTmh6nbUHcbxawGWegw7i1Z9XXpt4YJEd/exec';
+
+  let selectedFiles = [];
+  let selectedUrgency = '';
+
+  // ─── URGENCY PILLS ───
+  function selectUrgency(el, cls) {
+    document.querySelectorAll('.urgency-pill').forEach(p => {
+      p.className = 'urgency-pill';
+    });
+    el.classList.add(cls);
+    selectedUrgency = el.dataset.value;
+    document.getElementById('urgencyInput').value = selectedUrgency;
+  }
+
+  // ─── FILE INPUT ───
+  document.getElementById('imageFile').addEventListener('change', function(e) {
+    selectedFiles = Array.from(e.target.files);
+    renderFileList();
+  });
+
+  const uploadBox = document.getElementById('uploadBox');
+  uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('dragover'); });
+  uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('dragover'));
+  uploadBox.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadBox.classList.remove('dragover');
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if (files.length) { selectedFiles = files; renderFileList(); }
+  });
+
+  function formatBytes(b) {
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+    return (b/1048576).toFixed(1) + ' MB';
+  }
+
+  function renderFileList() {
+    const list = document.getElementById('fileList');
+    if (!selectedFiles.length) { list.innerHTML = ''; return; }
+    list.innerHTML = selectedFiles.map((f, i) => `
+      <div class="file-item" id="fi_${i}">
+        <span>🖼</span>
+        <span class="file-name">${f.name}</span>
+        <span class="file-size">${formatBytes(f.size)}</span>
+        <span class="file-status status-ready" id="fs_${i}">รอส่ง</span>
+      </div>
+    `).join('');
+    setStatus(`เลือก ${selectedFiles.length} ไฟล์ · จะอัปโหลดเมื่อกดส่ง`, 'info');
+  }
+
+  function setStatus(msg, cls = '') {
+    const el = document.getElementById('uploadStatus');
+    el.className = 'upload-status ' + cls;
+    el.innerText = msg;
+  }
+
+  // ─── UPLOAD ───
+  async function uploadFiles(repairId, meta) {
+    if (!selectedFiles.length) return [];
+    if (!GDRIVE_SCRIPT_URL) return [];
+
+    const links = [];
+    setStatus(`กำลังอัปโหลด 0/${selectedFiles.length} ไฟล์...`, 'info');
+
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i];
+      const fsEl = document.getElementById(`fs_${i}`);
+      fsEl.className = 'file-status status-sending';
+      fsEl.innerText = 'กำลังส่ง...';
+
+      try {
+        const base64 = await new Promise((res, rej) => {
+          const r = new FileReader();
+          r.onload = () => res(r.result.split(',')[1]);
+          r.onerror = rej;
+          r.readAsDataURL(file);
+        });
+
+        const params = new URLSearchParams({
+          repairId: String(repairId),
+          fileName: file.name,
+          mimeType: file.type,
+          base64Data: base64,
+          company: meta.company || '',
+          requester: meta.requester || '',
+          location: meta.location || ''
+        });
+
+        await fetch(GDRIVE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params.toString()
+        });
+
+        links.push({ name: file.name });
+        fsEl.className = 'file-status status-done';
+        fsEl.innerText = '✓ ส่งแล้ว';
+      } catch (err) {
+        fsEl.className = 'file-status status-error';
+        fsEl.innerText = '✗ ผิดพลาด';
+      }
+
+      setStatus(`อัปโหลด ${Math.min(i+1, selectedFiles.length)}/${selectedFiles.length} ไฟล์...`, 'info');
+    }
+
+    setStatus(`✓ ส่งรูปภาพ ${links.length} ไฟล์ไปยัง Google Drive แล้ว`, 'success');
+    return links;
+  }
+
+  // ─── SUBMIT ───
+  document.getElementById('repairForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    // ตรวจ urgency
+    if (!selectedUrgency) {
+      alert('กรุณาเลือกระดับความเร่งด่วน');
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerText = '⏳ กำลังส่ง...';
+
+    const f = new FormData(e.target);
+    const repairId = Date.now();
+    const meta = {
+      company: f.get('company'),
+      requester: f.get('requester'),
+      location: f.get('location')
+    };
+
+    // อัปโหลดรูป
+    await uploadFiles(repairId, meta);
+
+    // บันทึกใน localStorage (สำหรับ Admin ดูใน facility-portal)
+    try {
+      const stored = JSON.parse(localStorage.getItem('fsp_v2_data') || '{"bookings":[],"repairs":[],"risks":[]}');
+      stored.repairs.push({
+        id: repairId,
+        company: f.get('company'),
+        requester: f.get('requester'),
+        department: f.get('department'),
+        phone: f.get('phone'),
+        location: f.get('location'),
+        locationDetail: f.get('locationDetail'),
+        category: f.get('category'),
+        urgency: selectedUrgency,
+        detail: f.get('detail'),
+        driveLinks: [],
+        status: 'New Request',
+        date: new Date().toISOString().slice(0, 10)
+      });
+      localStorage.setItem('fsp_v2_data', JSON.stringify(stored));
+    } catch(err) { /* ไม่ block ถ้า localStorage fail */ }
+
+    // แสดงหน้าสำเร็จ
+    document.getElementById('refNumber').innerText = 'RPR-' + repairId;
+    document.getElementById('formCard').style.display = 'none';
+    document.getElementById('successCard').style.display = 'block';
+    window.scrollTo(0, 0);
+  });
+
+  // ─── RESET ───
+  function resetForm() {
+    selectedFiles = [];
+    selectedUrgency = '';
+    document.getElementById('fileList').innerHTML = '';
+    document.getElementById('uploadStatus').innerText = '';
+    document.getElementById('urgencyInput').value = '';
+    document.querySelectorAll('.urgency-pill').forEach(p => p.className = 'urgency-pill');
+    document.getElementById('repairForm').reset();
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').innerText = '✓ ส่งรายการแจ้งซ่อม';
+    document.getElementById('formCard').style.display = 'block';
+    document.getElementById('successCard').style.display = 'none';
+    window.scrollTo(0, 0);
+  }
+</script>
+
+</body>
+</html>

@@ -577,23 +577,24 @@
         });
 
         const params = new URLSearchParams({
-          repairId: String(repairId),
-          fileName: file.name,
-          mimeType: file.type,
+          repairId:  String(repairId),
+          fileName:  file.name,
+          mimeType:  file.type,
           base64Data: base64,
-          company: meta.company || '',
+          company:   meta.company   || '',
           requester: meta.requester || '',
-          location: meta.location || ''
+          location:  meta.location  || ''
         });
 
-        await fetch(GDRIVE_SCRIPT_URL, {
+        const resp = await fetch(GDRIVE_SCRIPT_URL, {
           method: 'POST',
-          mode: 'no-cors',
+          mode:   'no-cors',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: params.toString()
+          body:   params.toString()
         });
 
-        links.push({ name: file.name });
+        // no-cors ไม่รู้ response — เก็บ placeholder ไว้ก่อน
+        links.push({ name: file.name, url: '' });
         fsEl.className = 'file-status status-done';
         fsEl.innerText = '✓ ส่งแล้ว';
       } catch (err) {
@@ -625,7 +626,6 @@
     const f = new FormData(e.target);
     const repairId = Date.now();
 
-    // รวมข้อมูลทั้งหมด
     const meta = {
       repairId:       String(repairId),
       company:        f.get('company')        || '',
@@ -639,10 +639,16 @@
       detail:         f.get('detail')         || ''
     };
 
-    // ─── ส่งข้อมูลฟอร์มไปยัง Apps Script เสมอ (ไม่ว่าจะมีรูปหรือไม่) ───
+    // ─── 1. อัปโหลดรูปก่อน (ถ้ามี) เพื่อได้ลิงก์ ───
+    const imageUrls = await uploadFiles(repairId, meta);
+
+    // ─── 2. ส่งข้อมูลฟอร์ม พร้อมลิงก์รูปภาพ ───
     if (GDRIVE_SCRIPT_URL) {
       try {
-        const params = new URLSearchParams(meta);
+        const params = new URLSearchParams({
+          ...meta,
+          imageUrls: imageUrls.map(l => l.url).filter(Boolean).join(',')
+        });
         await fetch(GDRIVE_SCRIPT_URL, {
           method:  'POST',
           mode:    'no-cors',
@@ -652,29 +658,20 @@
       } catch(err) { console.error('Form submit error:', err); }
     }
 
-    // อัปโหลดรูป (ถ้ามี)
-    await uploadFiles(repairId, meta);
-
-    // บันทึกใน localStorage (สำหรับ Admin ดูใน facility-portal)
+    // บันทึกใน localStorage
     try {
       const stored = JSON.parse(localStorage.getItem('fsp_v2_data') || '{"bookings":[],"repairs":[],"risks":[]}');
       stored.repairs.push({
         id: repairId,
-        company: f.get('company'),
-        requester: f.get('requester'),
-        department: f.get('department'),
-        phone: f.get('phone'),
-        location: f.get('location'),
-        locationDetail: f.get('locationDetail'),
-        category: f.get('category'),
-        urgency: selectedUrgency,
-        detail: f.get('detail'),
-        driveLinks: [],
-        status: 'New Request',
-        date: new Date().toISOString().slice(0, 10)
+        company: meta.company, requester: meta.requester,
+        department: meta.department, phone: meta.phone,
+        location: meta.location, locationDetail: meta.locationDetail,
+        category: meta.category, urgency: meta.urgency,
+        detail: meta.detail, driveLinks: imageUrls,
+        status: 'New Request', date: new Date().toISOString().slice(0, 10)
       });
       localStorage.setItem('fsp_v2_data', JSON.stringify(stored));
-    } catch(err) { /* ไม่ block ถ้า localStorage fail */ }
+    } catch(err) { }
 
     // แสดงหน้าสำเร็จ
     document.getElementById('refNumber').innerText = 'RPR-' + repairId;

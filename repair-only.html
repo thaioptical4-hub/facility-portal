@@ -554,19 +554,30 @@
     el.innerText = msg;
   }
 
-  // ─── UPLOAD ───
-  async function uploadFiles(repairId, meta) {
-    if (!selectedFiles.length) return [];
-    if (!GDRIVE_SCRIPT_URL) return [];
+  // ─── UPLOAD + SUBMIT ในคำขอเดียว ───
+  async function submitWithFiles(meta) {
+    if (!GDRIVE_SCRIPT_URL) return;
 
-    const links = [];
-    setStatus(`กำลังอัปโหลด 0/${selectedFiles.length} ไฟล์...`, 'info');
+    // ถ้าไม่มีรูป — ส่งข้อมูลฟอร์มอย่างเดียว
+    if (!selectedFiles.length) {
+      setStatus('กำลังส่งข้อมูล...', 'info');
+      const params = new URLSearchParams(meta);
+      await fetch(GDRIVE_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+      });
+      setStatus('✓ ส่งข้อมูลสำเร็จ', 'success');
+      return;
+    }
 
+    // ถ้ามีรูป — ส่งรูปแรกพร้อมข้อมูลฟอร์ม รูปที่เหลือส่งตาม
     for (let i = 0; i < selectedFiles.length; i++) {
-      const file = selectedFiles[i];
-      const fsEl = document.getElementById(`fs_${i}`);
+      const file  = selectedFiles[i];
+      const fsEl  = document.getElementById(`fs_${i}`);
       fsEl.className = 'file-status status-sending';
       fsEl.innerText = 'กำลังส่ง...';
+      setStatus(`กำลังส่ง ${i+1}/${selectedFiles.length}...`, 'info');
 
       try {
         const base64 = await new Promise((res, rej) => {
@@ -576,37 +587,28 @@
           r.readAsDataURL(file);
         });
 
-        const params = new URLSearchParams({
-          repairId:  String(repairId),
-          fileName:  file.name,
-          mimeType:  file.type,
-          base64Data: base64,
-          company:   meta.company   || '',
-          requester: meta.requester || '',
-          location:  meta.location  || ''
-        });
+        // รวมข้อมูลฟอร์ม + รูปในคำขอเดียว (เฉพาะรูปแรก)
+        // รูปที่ 2+ ส่งแค่รูป พร้อม repairId เพื่อให้ Script รู้ว่าเป็นชุดเดียวกัน
+        const payload = i === 0
+          ? { ...meta, base64Data: base64, fileName: file.name, mimeType: file.type }
+          : { repairId: meta.repairId, base64Data: base64, fileName: file.name, mimeType: file.type, _imageOnly: '1' };
 
-        const resp = await fetch(GDRIVE_SCRIPT_URL, {
-          method: 'POST',
-          mode:   'no-cors',
+        const params = new URLSearchParams(payload);
+        await fetch(GDRIVE_SCRIPT_URL, {
+          method: 'POST', mode: 'no-cors',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body:   params.toString()
+          body: params.toString()
         });
 
-        // no-cors ไม่รู้ response — เก็บ placeholder ไว้ก่อน
-        links.push({ name: file.name, url: '' });
         fsEl.className = 'file-status status-done';
         fsEl.innerText = '✓ ส่งแล้ว';
-      } catch (err) {
+      } catch(err) {
         fsEl.className = 'file-status status-error';
         fsEl.innerText = '✗ ผิดพลาด';
+        console.error(err);
       }
-
-      setStatus(`อัปโหลด ${Math.min(i+1, selectedFiles.length)}/${selectedFiles.length} ไฟล์...`, 'info');
     }
-
-    setStatus(`✓ ส่งรูปภาพ ${links.length} ไฟล์ไปยัง Google Drive แล้ว`, 'success');
-    return links;
+    setStatus(`✓ ส่งครบ ${selectedFiles.length} ไฟล์`, 'success');
   }
 
   // ─── SUBMIT ───
@@ -639,36 +641,16 @@
       detail:         f.get('detail')         || ''
     };
 
-    // ─── 1. อัปโหลดรูปก่อน (ถ้ามี) เพื่อได้ลิงก์ ───
-    const imageUrls = await uploadFiles(repairId, meta);
-
-    // ─── 2. ส่งข้อมูลฟอร์ม พร้อมลิงก์รูปภาพ ───
-    if (GDRIVE_SCRIPT_URL) {
-      try {
-        const params = new URLSearchParams({
-          ...meta,
-          imageUrls: imageUrls.map(l => l.url).filter(Boolean).join(',')
-        });
-        await fetch(GDRIVE_SCRIPT_URL, {
-          method:  'POST',
-          mode:    'no-cors',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body:    params.toString()
-        });
-      } catch(err) { console.error('Form submit error:', err); }
-    }
+    // ส่งข้อมูล + รูปในคำขอเดียว (รูปแรกรวมกับข้อมูลฟอร์ม)
+    await submitWithFiles(meta);
 
     // บันทึกใน localStorage
     try {
       const stored = JSON.parse(localStorage.getItem('fsp_v2_data') || '{"bookings":[],"repairs":[],"risks":[]}');
       stored.repairs.push({
-        id: repairId,
-        company: meta.company, requester: meta.requester,
-        department: meta.department, phone: meta.phone,
-        location: meta.location, locationDetail: meta.locationDetail,
-        category: meta.category, urgency: meta.urgency,
-        detail: meta.detail, driveLinks: imageUrls,
-        status: 'New Request', date: new Date().toISOString().slice(0, 10)
+        id: repairId, ...meta,
+        driveLinks: [], status: 'New Request',
+        date: new Date().toISOString().slice(0, 10)
       });
       localStorage.setItem('fsp_v2_data', JSON.stringify(stored));
     } catch(err) { }

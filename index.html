@@ -660,7 +660,7 @@
         <span class="nav-icon">📅</span> จองห้องประชุม
       </button>
       <button class="nav-btn" onclick="showPage('repair', this)">
-        <span class="nav-icon">🔧</span> แจ้งซ่อมอาคารสถานที่
+        <span class="nav-icon">🔧</span> แจ้งซ่อมอาคารสถานที่ (ย้ายแล้ว)
       </button>
       <button class="nav-btn" onclick="showPage('risk', this)">
         <span class="nav-icon">🛡</span> ตรวจความเสี่ยงโรงงาน
@@ -816,6 +816,18 @@
       <!-- ─── REPAIR FORM ─── -->
       <section id="repair" class="page">
         <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>🔧</span> แจ้งซ่อมอาคารสถานที่ — ย้ายไประบบใหม่แล้ว</div>
+          </div>
+          <div class="form-section" style="text-align:center; padding:40px 24px;">
+            <p style="font-size:1.05rem; font-weight:600; margin-bottom:8px;">ระบบแจ้งซ่อมย้ายไปที่ลิงก์ใหม่แล้ว</p>
+            <p style="color:#5b6b7e; margin-bottom:24px; line-height:1.6;">แจ้งซ่อมได้ที่ระบบใหม่ เลือกความเร่งด่วนได้ ติดตามสถานะ และรับแจ้งเตือนผ่าน LINE<br>งานที่แจ้งในหน้านี้จะไม่ถูกส่งไปที่ทีมช่างแล้ว</p>
+            <a class="btn btn-primary" href="https://repair-request-swart.vercel.app/" style="display:inline-block; text-decoration:none; padding:14px 28px;">ไปที่ระบบแจ้งซ่อมใหม่ →</a>
+            <p style="color:#8b9bb0; font-size:0.8rem; margin-top:16px;">repair-request-swart.vercel.app</p>
+          </div>
+        </div>
+        <!-- Old form kept hidden so the page's scripts still find its elements. -->
+        <div class="panel" style="display:none;" aria-hidden="true">
           <div class="panel-header">
             <div class="panel-title"><span>🔧</span> แบบฟอร์มแจ้งซ่อมอาคารสถานที่</div>
           </div>
